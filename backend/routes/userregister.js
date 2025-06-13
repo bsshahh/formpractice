@@ -1,0 +1,18 @@
+import express from "express";
+import userregcontroller from "../controller/userregcontroller.js";
+
+
+const {createUser,Alluser,deleteUser,updateUser}=userregcontroller;
+
+
+const router=express.Router();
+
+router.get("/fetchuser", Alluser);
+
+router.post("/register",createUser);
+router.delete("/udelete/:id",deleteUser);
+router.put("/updatedetail/:id",updateUser);
+
+
+
+export default router;
