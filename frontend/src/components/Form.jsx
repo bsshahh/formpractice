@@ -5,28 +5,36 @@ import axiosInstance from "../../utils/axiosInstance";
 const Form = () => {
   const navigate = useNavigate();
 
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [formData, setFormData] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    mobile: "",
+    role: "user",
+  });
+
   const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e, role = "user") => {
     e.preventDefault();
 
-    const formData = {
-      firstname,
-      lastname,
-      email,
-      password,
-      mobile,
-      role,
-    };
+    const { firstname, lastname, email, password, mobile } = formData;
 
     if (!firstname || !lastname || !email || !password || !mobile) {
       setError("Please fill in all fields");
       return;
     }
+
+    const submitData = { ...formData, role };
 
     if (role === "admin") {
       const admincode = prompt("Enter Admin Secret Code:");
@@ -34,18 +42,18 @@ const Form = () => {
         alert("Admin code is required");
         return;
       }
-      formData.admincode = admincode;
+      submitData.admincode = admincode;
     }
 
     try {
-      const response = await axiosInstance.post("/user/register", formData);
+      const response = await axiosInstance.post("/user/register", submitData);
       console.log("Registration successful:", response.data);
       navigate("/login");
     } catch (error) {
       console.error("Error during registration:", error);
       const message =
         error.response?.data?.message ||
-        error.response?.data?.errors?.[0]?.msg || // for array-based validation errors
+        error.response?.data?.errors?.[0]?.msg ||
         "Registration failed. Please try again.";
       setError(message);
     }
@@ -62,40 +70,40 @@ const Form = () => {
             type="text"
             name="firstname"
             placeholder="First Name"
-            value={firstname}
-            onChange={(e) => setFirstname(e.target.value)}
+            value={formData.firstname}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
           <input
             type="text"
             name="lastname"
             placeholder="Last Name"
-            value={lastname}
-            onChange={(e) => setLastname(e.target.value)}
+            value={formData.lastname}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
           <input
             type="email"
             name="email"
             placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
           <input
             type="password"
             name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
           <input
             type="tel"
             name="mobile"
             placeholder="Mobile Number"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
+            value={formData.mobile}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
 
