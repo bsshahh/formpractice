@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import axios from "axios";
-import axiosInstance from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/axiosInstance";
+
 const LoginForm = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
+  const [error,setError]=useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -21,54 +21,76 @@ const LoginForm = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      alert("Please fill in both fields");
+      setError("Please fill in both fields");
       return;
     }
 
-    console.log("Login submitted:", formData);
-    try{
+    try {
       const res = await axiosInstance.post("/auth/login", formData);
-      console.log("Response:", res.data);
-      if(res.data.role==="admin"){
+      if (res.data.role === "admin") {
         navigate("/admin/dashboard");
-      }
-      else{
+      } else {
         navigate("/dashboard");
       }
-    }catch(err){
-      console.error("Error:", err.response?.data || err.message);
-      alert("Login failed: " + (err.response?.data || err.message));
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.[0]?.msg || 
+        "Login failed. Please try again.";
+      setError(message);
     }
-    
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-md bg-white">
-      <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          Login
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+        <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Login</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+          <div className="mt-2 flex flex-col items-end space-y-2 text-sm sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
+          <button type="button"
+            onClick={() => navigate("/forgot-password")}
+            className="text-blue-500 hover:underline "
+          >
+            Forgot Password?
+          </button>
+          </div>
+          {error && (
+          <div className="mt-4 text-sm text-red-600 text-center">{error}</div>
+        )}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Login
+          </button>
+        </form>
+
+        <div className="mt-6 flex flex-col sm:flex-row justify-end items-center text-sm">
+          
+          <button
+            onClick={() => navigate("/register")}
+            className="text-gray-600 hover:underline mt-4 sm:mt-0"
+          >
+            Not registered? <span className="text-blue-600 font-semibold">Register here</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
