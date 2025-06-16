@@ -8,11 +8,11 @@ const authcontroller = {
         try {
           const user = await User.findOne({ email });
           if (!user) {
-            return res.status(401).send("Invalid credentials");
+            return res.status(401).json({message:"Invalid email"});
           }
           const ismatch = await bcrypt.compare(password, user.password);
           if (!ismatch) {
-            return res.status(401).send("Invalid password");
+            return res.status(401).json({message:"Invalid password"});
           }
           // res.send(user);
           const token = jwt.sign(
@@ -34,6 +34,7 @@ const authcontroller = {
             role:user.role
           });
         } catch (err) {
+          console.error("Login error:", err);
           res.status(500).send("something went wrong");
         }
       },

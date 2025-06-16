@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import auth from "./routes/auth.js";
+import bodyParser from 'body-parser';
 dotenv.config()
 const app=express();
 
@@ -15,6 +16,7 @@ app.use(cors(
     credentials:true,
 }
 ));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use("/user",userregister);
 app.use("/auth",auth);
